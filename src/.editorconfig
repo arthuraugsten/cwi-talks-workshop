@@ -1,0 +1,22 @@
+root = true
+
+[*]
+end_of_line = crlf
+insert_final_newline = false
+indent_style = space
+indent_size = 4
+charset = utf-8
+trim_trailing_whitespace = true
+
+[*.{cs,css,scss,less,js,json,ts,sass,php,html,hbs,mustache,phtml,html.twig}]
+
+[*.yml]
+indent_style = space
+indent_size = 2
+
+[*.json]
+indent_style = space
+indent_size = 2
+
+[*.sh]
+end_of_line = lf

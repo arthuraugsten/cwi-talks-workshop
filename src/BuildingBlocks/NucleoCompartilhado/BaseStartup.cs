@@ -39,13 +39,13 @@ namespace NucleoCompartilhado
             serviços.AddControllers().AddNewtonsoftJson();
         }
 
-        public void Configurar<TContexto>(IApplicationBuilder aplicativo, IWebHostEnvironment ambiente, Action eventBus = default)
+        public void Configurar<TContexto>(IApplicationBuilder aplicativo, IWebHostEnvironment ambiente, string nomeServiço, Action eventBus = default)
             where TContexto : DbContext
         {
             if (ambiente.IsDevelopment())
                 aplicativo.UseDeveloperExceptionPage();
 
-            aplicativo.UsarSwagger(Configuração);
+            aplicativo.UsarSwagger(Configuração, nomeServiço);
             aplicativo.UseCors(NomePoliticaCors);
 
             aplicativo.UseRouting();

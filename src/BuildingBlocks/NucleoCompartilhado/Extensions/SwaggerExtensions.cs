@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NucleoCompartilhado.Config;
 using System;
+using System.Collections.Generic;
 
 namespace NucleoCompartilhado.Extensions
 {
@@ -35,11 +36,24 @@ namespace NucleoCompartilhado.Extensions
             serviços.AddSwaggerGenNewtonsoftSupport();
         }
 
-        public static void UsarSwagger(this IApplicationBuilder aplicativo, IConfiguration configurações)
+        public static void UsarSwagger(this IApplicationBuilder aplicativo, IConfiguration configurações, string nomeServiço)
         {
             var configuracaoSwagger = aplicativo.ApplicationServices.GetRequiredService<IOptions<SwaggerConfig>>().Value;
+            var urlApiGateway = configurações.GetValue<string>($"{nameof(ApiGatewayConfig)}{nameof(ApiGatewayConfig.Url)}");
 
-            aplicativo.UseSwagger();
+            var servidores = new List<OpenApiServer>(1)
+            {
+                new OpenApiServer { Url = $"{urlApiGateway}/{nomeServiço}" }
+            };
+
+            aplicativo.UseSwagger(c =>
+            {
+                c.PreSerializeFilters.Add((docOpenApi, reqHttp) =>
+                {
+                    servidores.Add(new OpenApiServer { Url = $"{reqHttp.Scheme}://{reqHttp.Host}" });
+                    docOpenApi.Servers = servidores;
+                });
+            });
             aplicativo.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("v1/swagger.json", configuracaoSwagger.Titulo);

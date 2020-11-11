@@ -30,6 +30,18 @@ services:
     networks:
       - tarefas_app
 
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ../
+      dockerfile: src/ApiGateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8080:80"
+    networks:
+      - tarefas_app
+
   tarefas:
     container_name: tarefas
     build:

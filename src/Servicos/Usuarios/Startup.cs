@@ -17,6 +17,6 @@ namespace Usuarios
             => ConfigurarServiços<UsuáriosContexto>(serviços, serviços.AdicionarDependências);
 
         public void Configure(IApplicationBuilder aplicativo, IWebHostEnvironment ambiente)
-            => Configurar<UsuáriosContexto>(aplicativo, ambiente);
+            => Configurar<UsuáriosContexto>(aplicativo, ambiente, "usuarios");
     }
 }

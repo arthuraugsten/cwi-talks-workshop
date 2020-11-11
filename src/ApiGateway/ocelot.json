@@ -1,0 +1,35 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "tarefas",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/tarefas/{everything}",
+      "UpstreamHttpMethod": [
+        "GET", "POST", "PUT", "DELETE"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "usuarios",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/usuarios/{everything}",
+      "UpstreamHttpMethod": [
+        "GET", "POST", "PUT", "DELETE"
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:8080"
+  }
+}

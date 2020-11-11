@@ -15,6 +15,21 @@ services:
     networks:
       - tarefas_app
 
+  rabbitmq:
+    image: rabbitmq:3.8.3-management-alpine
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=usuario
+      - RABBITMQ_DEFAULT_PASS=z8YR1jHtZtiB
+      - RABBITMQ_VM_MEMORY_HIGH_WATERMARK=0.7
+    volumes:
+      - /var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - tarefas_app
+
   tarefas:
     container_name: tarefas
     build:
@@ -23,12 +38,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
       - ConnectionStrings__Default=Server=banco;Database=TarefasDb;User Id=sa;Password=bX42V5oOZ7Bg;
+      - EventBusConfig__Host=rabbitmq
+      - EventBusConfig__Porta=5672
+      - EventBusConfig__Usuario=usuario
+      - EventBusConfig__Senha=z8YR1jHtZtiB
     ports:
       - "8081:80"
     networks:
       - tarefas_app
     depends_on:
       - banco
+      - rabbitmq
 
   usuarios:
     container_name: usuarios
@@ -38,12 +58,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
       - ConnectionStrings__Default=Server=banco;Database=UsuariosDb;User Id=sa;Password=bX42V5oOZ7Bg;
+      - EventBusConfig__Host=rabbitmq
+      - EventBusConfig__Porta=5672
+      - EventBusConfig__Usuario=usuario
+      - EventBusConfig__Senha=z8YR1jHtZtiB
     ports:
       - "8082:80"
     networks:
       - tarefas_app
     depends_on:
       - banco
+      - rabbitmq
 
 networks:
   tarefas_app:

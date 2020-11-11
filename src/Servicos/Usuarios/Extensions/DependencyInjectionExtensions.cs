@@ -13,6 +13,7 @@ namespace Usuarios.Extensions
             if (configurações is null) throw new ArgumentNullException(nameof(serviços));
 
             serviços.AdicionarSwagger(configurações);
+            serviços.AdicionarEventBus(configurações);
         }
     }
 }

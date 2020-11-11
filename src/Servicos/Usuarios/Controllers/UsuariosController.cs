@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NucleoCompartilhado.EventBus;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Usuarios.Dados.Contextos;
 using Usuarios.Dominio.Entities;
 using Usuarios.Dtos;
+using Usuarios.Eventos;
 
 namespace Usuarios.Controllers
 {
@@ -15,9 +17,13 @@ namespace Usuarios.Controllers
     public sealed class UsuariosController : ControllerBase
     {
         private readonly UsuáriosContexto _contexto;
+        private readonly IEventBus _eventBus;
 
-        public UsuariosController(UsuáriosContexto contexto)
-            => _contexto = contexto;
+        public UsuariosController(UsuáriosContexto contexto, IEventBus eventBus)
+        {
+            _contexto = contexto;
+            _eventBus = eventBus;
+        }
 
         [HttpPost("criar")]
         [ProducesResponseType(typeof(BadRequestResult), StatusCodes.Status400BadRequest)]
@@ -30,6 +36,8 @@ namespace Usuarios.Controllers
             var novoUsuário = new Usuário(usuário.Nome, usuário.Senha);
             await _contexto.Usuários.AddAsync(novoUsuário);
             await _contexto.SaveChangesAsync();
+
+            _eventBus.Publicar(new UsuarioCriadoEventoIntegracao(novoUsuário.Id, novoUsuário.Nome));
 
             return Ok(novoUsuário);
         }
@@ -62,6 +70,8 @@ namespace Usuarios.Controllers
             usuárioEdição.Atualizar(usuário.Nome, usuário.Ativo);
             await _contexto.SaveChangesAsync();
 
+            _eventBus.Publicar(new UsuarioEditadoEventoIntegracao(id, usuário.Nome, usuário.Ativo));
+
             return Ok(usuárioEdição);
         }
 
@@ -76,6 +86,8 @@ namespace Usuarios.Controllers
 
             usuárioInativação.Inativar();
             await _contexto.SaveChangesAsync();
+
+            _eventBus.Publicar(new UsuarioEditadoEventoIntegracao(id, usuárioInativação.Nome, usuárioInativação.Ativo));
 
             return NoContent();
         }

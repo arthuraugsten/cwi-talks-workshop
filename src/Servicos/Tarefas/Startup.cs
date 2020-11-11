@@ -17,6 +17,6 @@ namespace Tarefas
             => ConfigurarServiços<TarefasContexto>(serviços, serviços.AdicionarDependências);
 
         public void Configure(IApplicationBuilder aplicativo, IWebHostEnvironment ambiente)
-            => Configurar<TarefasContexto>(aplicativo, ambiente, "tarefas", aplicativo.UsarEventosIntegrações);
+            => Configurar<TarefasContexto>(aplicativo, ambiente, aplicativo.UsarEventosIntegrações);
     }
 }

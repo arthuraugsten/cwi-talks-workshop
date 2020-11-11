@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NucleoCompartilhado.Config;
+using NucleoCompartilhado.Filtros;
 using System;
 using System.Collections.Generic;
 
@@ -31,15 +32,17 @@ namespace NucleoCompartilhado.Extensions
                 });
 
                 options.DescribeAllParametersInCamelCase();
+                options.DocumentFilter<FiltroDeVerificacaoSaude>();
                 options.CustomSchemaIds(c => c.FullName);
             });
             serviços.AddSwaggerGenNewtonsoftSupport();
         }
 
-        public static void UsarSwagger(this IApplicationBuilder aplicativo, IConfiguration configurações, string nomeServiço)
+        public static void UsarSwagger(this IApplicationBuilder aplicativo, IConfiguration configurações)
         {
             var configuracaoSwagger = aplicativo.ApplicationServices.GetRequiredService<IOptions<SwaggerConfig>>().Value;
             var urlApiGateway = configurações.GetValue<string>($"{nameof(ApiGatewayConfig)}{nameof(ApiGatewayConfig.Url)}");
+            var nomeServiço = configurações.GetValue<string>($"{nameof(ConsulConfig)}:{nameof(ConsulConfig.NomeServico)}");
 
             var servidores = new List<OpenApiServer>(1)
             {

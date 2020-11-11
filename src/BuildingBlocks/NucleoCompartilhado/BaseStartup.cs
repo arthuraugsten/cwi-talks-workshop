@@ -23,6 +23,8 @@ namespace NucleoCompartilhado
             where TContexto : DbContext
         {
             injeçãoDependências?.Invoke(Configuração);
+            serviços.AdicionarConsul(Configuração);
+            serviços.AdicionarVerificacaoSaude();
 
             serviços.AddDbContext<TContexto>(options =>
                     options.UseSqlServer(
@@ -39,20 +41,23 @@ namespace NucleoCompartilhado
             serviços.AddControllers().AddNewtonsoftJson();
         }
 
-        public void Configurar<TContexto>(IApplicationBuilder aplicativo, IWebHostEnvironment ambiente, string nomeServiço, Action eventBus = default)
+        public void Configurar<TContexto>(IApplicationBuilder aplicativo, IWebHostEnvironment ambiente, Action eventBus = default)
             where TContexto : DbContext
         {
             if (ambiente.IsDevelopment())
                 aplicativo.UseDeveloperExceptionPage();
 
-            aplicativo.UsarSwagger(Configuração, nomeServiço);
+            aplicativo.UsarSwagger(Configuração);
             aplicativo.UseCors(NomePoliticaCors);
 
             aplicativo.UseRouting();
 
             aplicativo.UseRewriter(new RewriteOptions().AddRedirect("^$", "swagger"));
+            aplicativo.UsarRotasEVerificacaoSaude();
 
             aplicativo.UseEndpoints(endpoints => endpoints.MapControllers());
+
+            aplicativo.UsarConsul<BaseStartup>(Configuração, ambiente);
 
             using var escopo = aplicativo.ApplicationServices.CreateScope();
             escopo.ServiceProvider.MigrarContexto<TContexto>();

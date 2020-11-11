@@ -30,6 +30,18 @@ services:
     networks:
       - tarefas_app
 
+  consul:
+    image: consul:1.8.0
+    command: consul agent -dev -log-level=warn -ui -client=0.0.0.0
+    hostname: consul
+    container_name: consul
+    ports:
+      - "8500:8500"
+      - "8600:8600"
+      - "8600:8600/udp"
+    networks:
+      - tarefas_app
+
   api-gateway:
     container_name: api-gateway
     build:
@@ -41,6 +53,8 @@ services:
       - "8080:80"
     networks:
       - tarefas_app
+    depends_on:
+      - consul
 
   tarefas:
     container_name: tarefas
@@ -54,6 +68,8 @@ services:
       - EventBusConfig__Porta=5672
       - EventBusConfig__Usuario=usuario
       - EventBusConfig__Senha=z8YR1jHtZtiB
+      - ConsulConfig__UrlConsul=http://consul:8500
+      - ConsulConfig__NomeServico=tarefas
     ports:
       - "8081:80"
     networks:
@@ -61,6 +77,7 @@ services:
     depends_on:
       - banco
       - rabbitmq
+      - consul
 
   usuarios:
     container_name: usuarios
@@ -74,6 +91,8 @@ services:
       - EventBusConfig__Porta=5672
       - EventBusConfig__Usuario=usuario
       - EventBusConfig__Senha=z8YR1jHtZtiB
+      - ConsulConfig__UrlConsul=http://consul:8500
+      - ConsulConfig__NomeServico=usuarios
     ports:
       - "8082:80"
     networks:
@@ -81,6 +100,7 @@ services:
     depends_on:
       - banco
       - rabbitmq
+      - consul
 
 networks:
   tarefas_app:

@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  banco:
+    image: mcr.microsoft.com/mssql/server:2019-GA-ubuntu-16.04
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=bX42V5oOZ7Bg
+      - MSSQL_PID=Developer
+    ports:
+      - "5433:1433"
+    volumes:
+      - /var/opt/mssql
+    networks:
+      - tarefas_app
+
+  tarefas:
+    container_name: tarefas
+    build:
+      context: ../
+      dockerfile: src/Servicos/Tarefas/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ConnectionStrings__Default=Server=banco;Database=TarefasDb;User Id=sa;Password=bX42V5oOZ7Bg;
+    ports:
+      - "8081:80"
+    networks:
+      - tarefas_app
+    depends_on:
+      - banco
+
+  usuarios:
+    container_name: usuarios
+    build:
+      context: ../
+      dockerfile: src/Servicos/Usuarios/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ConnectionStrings__Default=Server=banco;Database=UsuariosDb;User Id=sa;Password=bX42V5oOZ7Bg;
+    ports:
+      - "8082:80"
+    networks:
+      - tarefas_app
+    depends_on:
+      - banco
+
+networks:
+  tarefas_app:
+    driver: bridge
